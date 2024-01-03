@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Setup file-extractor including its input bucket and output SQS queue
+Parameters:
+  BucketName:
+    Description: S3 Bucket name - must supply a unique name. Cannot rely on the created name as it adds a circular dependency
+    Type: String
+    Default: file-input-sorted-net
+#  Key:
+#    Description: S3 Object key
+#    Type: String
+#    Default: test
+#  Image:
+#    Type: String
+#    Default: "573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor:0.0.7"
+
+
+Resources:
+
+  FileInputBucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn:
+      - ExtractorPermission
+    Properties:
+      BucketName: !Ref BucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !GetAtt FileExtractor.Arn #'arn:aws:lambda:ap-southeast-2:573128978443:function:file-extractor' #!GetAtt FileExtractor.Arn
+
+  ExtractorPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref FileExtractor # 'arn:aws:lambda:ap-southeast-2:573128978443:function:file-extractor' # !Ref FileExtractor
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: !Sub "arn:aws:s3:::${BucketName}"
+
+  FileExtractor:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: file-extractor
+      PackageType: Image
+      Code:
+        ImageUri: "573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor:0.0.8"
+      MemorySize: 256
+      Timeout: 30
+      Role: !GetAtt LambdaExecutionRole.Arn # arn:aws:iam::573128978443:role/lambda-exec #!Ref LambdaExecutionRole
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: S3Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:*'
+                Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+#              - Effect: Allow
+#                  Action:
+#                    - 'logs:CreateLogGroup'
+#                    - 'logs:CreateLogStream'
+#                    - 'logs:PutLogEvents'
+#                  Resource: 'arn:aws:logs:*:*:*'
+
