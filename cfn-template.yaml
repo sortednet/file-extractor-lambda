@@ -2,9 +2,13 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Setup file-extractor including its input bucket and output SQS queue
 Parameters:
   BucketName:
-    Description: S3 Bucket name - must supply a (globablly) unique name. Cannot rely on the created name as it adds a circular dependency
+    Description: S3 Bucket name - must supply a (globaly) unique name. Cannot rely on the created name as it adds a circular dependency
     Type: String
     Default: file-input-sorted-net
+  QueueName:
+    Description: Queue the file conents is written to (line by line)
+    Type: String
+    Default: 'file-content-queue'
 
 Resources:
 
@@ -18,13 +22,13 @@ Resources:
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: 's3:ObjectCreated:*'
-            Function: !GetAtt FileExtractor.Arn #'arn:aws:lambda:ap-southeast-2:573128978443:function:file-extractor' #!GetAtt FileExtractor.Arn
+            Function: !GetAtt FileExtractor.Arn
 
   ExtractorPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref FileExtractor # 'arn:aws:lambda:ap-southeast-2:573128978443:function:file-extractor' # !Ref FileExtractor
+      FunctionName: !Ref FileExtractor
       Principal: s3.amazonaws.com
       SourceAccount: !Ref "AWS::AccountId"
       SourceArn: !Sub "arn:aws:s3:::${BucketName}"
@@ -36,10 +40,13 @@ Resources:
       FunctionName: file-extractor
       PackageType: Image
       Code:
-        ImageUri: "573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor:0.0.8"
+        ImageUri: "573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor:0.0.14"
       MemorySize: 256
       Timeout: 30
-      Role: !GetAtt LambdaExecutionRole.Arn # arn:aws:iam::573128978443:role/lambda-exec #!Ref LambdaExecutionRole
+      Environment:
+        Variables:
+          queuename: !Ref QueueName
+      Role: !GetAtt LambdaExecutionRole.Arn
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -65,10 +72,17 @@ Resources:
                 Action:
                   - 's3:*'
                 Resource: !Sub "arn:aws:s3:::${BucketName}/*"
-#              - Effect: Allow
-#                  Action:
-#                    - 'logs:CreateLogGroup'
-#                    - 'logs:CreateLogStream'
-#                    - 'logs:PutLogEvents'
-#                  Resource: 'arn:aws:logs:*:*:*'
+              - Effect: Allow
+                Action:
+                  - 'sqs:*'
+                Resource: !GetAtt ContentQueue.Arn
+
+  ContentQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueueName
+
+
+
+
 

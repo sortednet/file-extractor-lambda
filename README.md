@@ -1,4 +1,21 @@
 
+# Overview
+
+When a file is written to an S3 bucket, a lambda is called which reads the file line by line and sends a message to a SQS 
+queue for each line.
+
+
+```mermaid
+flowchart TD
+    A[s3-bucket] -->|Create Trigger| B(File Processor)
+    B --> C(SQS queue)
+    C -->|Type A| D[A processor]
+    C -->|Type B| E[B processor]
+    C -->|Type C| F[C processor]
+```
+
+
+
 # Build
 run 
 ```shell
