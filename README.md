@@ -30,6 +30,9 @@ run
 ./3-deploy.sh
 ```
 
+Note, the cloudformation creates the S3 bucket - arguably, this should be done externally and the name/arn passed in.
+
+
 ## removing stack
 The stack does not remove cleanly if the bucket is not empty - need to empty first then delete the bucket.
 
