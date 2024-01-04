@@ -13,6 +13,10 @@ run
 ./3-deploy.sh
 ```
 
+## removing stack
+The stack does not remove cleanly if the bucket is not empty - need to empty first then delete the bucket.
+
+
 # Testing
 Copy a file to s3 - output should be made to cloud watch
 aws s3 cp test-file.txt s3://file-input-sorted-net/test-file3.txt

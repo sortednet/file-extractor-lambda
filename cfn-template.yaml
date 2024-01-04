@@ -2,17 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Setup file-extractor including its input bucket and output SQS queue
 Parameters:
   BucketName:
-    Description: S3 Bucket name - must supply a unique name. Cannot rely on the created name as it adds a circular dependency
+    Description: S3 Bucket name - must supply a (globablly) unique name. Cannot rely on the created name as it adds a circular dependency
     Type: String
     Default: file-input-sorted-net
-#  Key:
-#    Description: S3 Object key
-#    Type: String
-#    Default: test
-#  Image:
-#    Type: String
-#    Default: "573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor:0.0.7"
-
 
 Resources:
 
@@ -20,6 +12,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     DependsOn:
       - ExtractorPermission
+    DeletionPolicy: Delete
     Properties:
       BucketName: !Ref BucketName
       NotificationConfiguration:
@@ -38,6 +31,7 @@ Resources:
 
   FileExtractor:
     Type: AWS::Lambda::Function
+    DeletionPolicy: Delete
     Properties:
       FunctionName: file-extractor
       PackageType: Image
