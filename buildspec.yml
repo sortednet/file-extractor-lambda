@@ -8,9 +8,8 @@ phases:
   pre_build:
     commands:
       - IMAGE_TAG=latest
-#      - AWS_ACCT=573128978443
-#      - AWS_REGION=ap-southeast-2
-      
+      - AWS_ACCT=573128978443
+      - AWS_REGION=ap-southeast-2
       - IMAGE_NAME=file-extractor
       - IMAGE_REGISTRY=${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
       - IMAGE=${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
