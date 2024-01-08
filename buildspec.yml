@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+      docker: 18
+  pre_build:
+    commands:
+      - IMAGE_TAG=latest
+#      - AWS_ACCT=573128978443
+#      - AWS_REGION=ap-southeast-2
+      
+      - IMAGE_NAME=file-extractor
+      - IMAGE_REGISTRY=${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+      - IMAGE=${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+      # - REGISTRY_PASSWORD=$(aws ecr get-login-password)
+  build:
+    commands:
+      - echo Build started on `date`
+      - env
+#      - mvn package dependency:copy-dependencies -DincludeScope=runtime jib:build -Djib.to.auth.password={REGISTRY_PASSWORD} -Djib.to.image=${IMAGE}-B
+      - mvn package dependency:copy-dependencies -DincludeScope=runtime jib:build -Djib.to.image=${IMAGE}-B
+#      - docker build --platform linux/amd64 -t ${IMAGE} .
+#      - $(aws ecr get-login --no-include-email)
+#      - docker push ${IMAGE}
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - target/test-java-lambda1-*.jar

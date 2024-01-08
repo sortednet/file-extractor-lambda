@@ -83,33 +83,76 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
       </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-shade-plugin</artifactId>-->
+<!--        <version>3.2.2</version>-->
+<!--        <configuration>-->
+<!--          <createDependencyReducedPom>false</createDependencyReducedPom>-->
+<!--          <filters>-->
+<!--            <filter>-->
+<!--                <artifact>*:*</artifact>-->
+<!--                <excludes>-->
+<!--                    <exclude>module-info.class</exclude>-->
+<!--                    <exclude>META-INF/*</exclude>-->
+<!--                    <exclude>META-INF/versions/**</exclude>-->
+<!--                    <exclude>META-INF/services/**</exclude>-->
+<!--                </excludes>-->
+<!--            </filter>-->
+<!--          </filters>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>shade</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.2</version>
+        <!--mvn compile jib:build -Djib.to.auth.username=${} -Djib.to.auth.password=${} -Djib.to.image=${} -->
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>3.4.0</version>
+        <!-- mvn compile jib:build-->
+        <!-- for local dev; mvn compile jib:dockerBuild -->
         <configuration>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
-          <filters>
-            <filter>
-                <artifact>*:*</artifact>
-                <excludes>
-                    <exclude>module-info.class</exclude>
-                    <exclude>META-INF/*</exclude>
-                    <exclude>META-INF/versions/**</exclude>
-                    <exclude>META-INF/services/**</exclude>
-                </excludes>
-            </filter>
-          </filters>
+          <from>
+            <image>public.ecr.aws/lambda/java:21</image>
+          </from>
+          <container>
+<!--            <entrypoint>/lambda-entrypoint.sh</entrypoint>-->
+            <entrypoint>/jib-lambda-entrypoint.sh</entrypoint>
+            <args>net.sorted.fileextractor.Handler::handleRequest</args>
+          </container>
+          <to>
+            <image>573128978443.dkr.ecr.ap-southeast-2.amazonaws.com/file-extractor-jib</image>
+            <auth>
+              <username>AWS</username>
+              <password>eyJwYXlsb2FkIjoiaUNDZHBqRjl3UXJvWXcydmRjckZQMWpuNEpkSUg3SmNiYy9ZZ3E0NS9lRWxpTVo2TnNEVWFkQnNXbWlqa1dTK3R2ZzQ4T3o0OXRFWnFSdUdmMzRjU01XTFVBTGQyVHlWcVpMUzQ4bmlNQnZLeWFhRnQ2d3RUWFZiVCtFcWJRWTlSb2hBWHZPUU4vbG5CL0czMzBxREFFUkVUVDBNNlJzcDlmek1wSlZsRVRDWkdsL3AyaHVhMGVLait4V1FON2c1WWdKY3FxNHpTcDB2dHFoVGZkWm8raTVLallBbjFGUzYzenRkQnhzRHhBdDM5YkpuWDZxMnd6MWtjemZwc2hmUzRUQmhhWXF0UCtvZnpseG45RTR1Y3dxSmZVWWMzeVY3MkJhTElpK2o1TFZnOUVkVmN5ZXJsbThDM3YrUFhFK2NHelQyd1MzUjNVUFV6ZVAzUDB6bzZEUHlRczVqSmYyRDZMRVdSN1lRQkVCWFpYOUVOY0xyRmltaW5aMElneVNac3kvNkFMeFZYa1VnTDJBVkhmWWlycm9ZSFVvTVl4TmVUWnRxd2VPVG53M2tRTHZXK01ud3Q5QUdVUndZVWZHWWpEYWRMUXNXdFNraXFEN0IraktyQThlb096dUxTNlphakUrb1ZpRVRnMFVoVHROSEw4aW5sQ3hoOGVoWndNVEJWN1RmdVpoNTVCS1IyV0RmczFFd2x0NkdUY1NpVThPOXpOVzZoZnZSWDEyekFBRGxyaHBmZVhtd3UxOFpUVG5yLzRQdWxnYS9jTFVKNHlnaDMrYVNiZmdwUzVPNS85ZlJBRDdmdUpQQ0NLRllkWXVUT0hCVTBhdlBYMjNCRVAxNVZLQkRGYXNXbUlSa3UvT0ZzcFJqVDcwak11Tjd0NFFHZEIxVTF2RHMreEh1VXc1dzh1akt0MFJ0aDJOV3RLRCtCczRHa0ZXL2dTU09MYnpKZTV0a2NxUC80ZmNZS2U4eUUyUnpiOXdTS3ZzSUtUbzhZbWN6cUZxSHh1NW12L1IzNDhveHBma1E3aFJ3SUxYeG52VWFjRU44dGVKSzdQRkVYenVaT2dteXdNWW5aSEo5V0t5bEpQRTB0UkZjai9VY2pIbCtvTGtqRmo1VGh5M0kwbHJXMzl0emQrMW9LaHB4Zm5LY1pJYW5jTW96VjErSTJjOUs5czV2UUZQQzZ4TnJsVUZ1dFdnbU9MOEM2SE90TGZteFlmdzBFNkZ3OFdQMDNYa09GeitZVmdOTXNra2lRWStpYU5KYk5XeFBDR2RQS0xucXpaS2U5Nk1HaHRhbjhKeEh6dWc1Y1FxbTN4Tzh3MFZtM0dJa3BIbHUraEsveVZOd0liNU8wdUdCSThVZFdPNVJCbnAwbTFTa0lCbDBqMDBPTGltMGlwVHJkREsxNkJPRHRYUT0iLCJkYXRha2V5IjoiQVFFQkFIaEx5ano3UEpFUG1ZYnFINkE2Zi93V056eXo1QkthMzdCbkJQc0F5dUYxS1FBQUFINHdmQVlKS29aSWh2Y05BUWNHb0c4d2JRSUJBREJvQmdrcWhraUc5dzBCQndFd0hnWUpZSVpJQVdVREJBRXVNQkVFREw3VnB2VTI4SXQ4UU8wUTB3SUJFSUE3ZUlQbFNSbVd6dFNuLy9tNWJlOWdUMHZWQ2tRdDJSV2lmSjhhY05lYldZNmxLS2dhUHorNjhLUVZCRXN1RkgvOFRKbHRjYjVOU0RTb1IzQT0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE3MDI5MTQ0ODR9</password>
+            </auth>
+          </to>
+          <extraDirectories>
+            <paths>
+              <path>
+                <from>src/main/jib/</from>
+                <into>/</into>
+                <includes>jib-lambda-entrypoint.sh</includes>
+              </path>
+            </paths>
+            <permissions>
+              <permission>
+                <file>/jib-lambda-entrypoint.sh</file>
+                <mode>755</mode>
+              </permission>
+            </permissions>
+          </extraDirectories>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
+      
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

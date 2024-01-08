@@ -16,18 +16,15 @@
       "s3": {
         "configurationId": "682bbb7a-xmpl-48ca-94b1-7f77c4d6dbf0",
         "bucket": {
-          "name": "FILE_UPLOAD_BUCKET",
+          "name": "file-input-sorted-net",
           "ownerIdentity": {
             "principalId": "A3XMPLFAF2AI3E"
           },
-          "arn": "arn:aws:s3:::FILE_UPLOAD_BUCKET"
+          "arn": "arn:aws:s3:::file-input-sorted-net"
         },
         "object": {
-          "key": "inbound/file00001.txt",
+          "key": "test-file1.txt",
           "size": 21476,
-          "eTag": "d132690b6c65b6d1629721dcfb49b883",
-          "versionId": "",
-          "sequencer": "005E64A65DF093B26D"
         },
         "s3SchemaVersion": "1.0"
       },

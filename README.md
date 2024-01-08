@@ -28,6 +28,29 @@ run
 ```
 This will build 'version' (eg 0.0.9) and push to ECR
 
+TODO
+* Use jib to build the image
+  Jib puts the classews in /approot - need to 
+
+
+# Local
+
+Run the built image:
+
+This relies on the auth details being in the .aws/credentials file, adjust if the environment is to be used
+```shell
+./4-start-local.sh
+```
+
+Once running, the lambda can be invoked with
+```shell
+curl "http://localhost:9000/2015-03-31/functions/function/invocations" --data-binary "@src/test/resources/s3-notification.json"
+```
+
+
+
+
+
 # Deploy
 Edit `cfn-template.yaml` to make sure the image version matches the one built
 run 
