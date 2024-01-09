@@ -7,16 +7,14 @@ queue for each line.
 
 ```mermaid
 flowchart TD
-    A[s3-bucket] -->|Create Trigger| B(File Processor)
+    A[s3-bucket] -->|Create Trigger| B(File Extractor)
     B --> C(SQS queue)
-    C -->|Type A| D[A processor]
-    C -->|Type B| E[B processor]
-    C -->|Type C| F[C processor]
+    C --> D[Processor]
 ```
 
-!!! This did not work put as planned !!!
+!!! **NB** !!!  
 Turns out an SQS queue can only have on consumer
-The filter deletes any messages that does not pass the filter
+An original attempt to add a filter to fan out the message faile. The filter deletes any messages that does not pass the filter.
 
 See this for reference: https://lucvandonkersgoed.com/2022/01/20/the-9-ways-an-sqs-message-can-be-deleted/#:~:text=The%20messages%20not%20matching%20the,been%20designed%20for%20single%20consumers.
 
